@@ -1,0 +1,60 @@
+/* index.wxss */
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-list {
+  flex: 1;
+  padding: 20rpx;
+}
+
+.message {
+  margin-bottom: 20rpx;
+  max-width: 80%;
+}
+
+.text-message {
+  background-color: #fff;
+  padding: 20rpx;
+  border-radius: 10rpx;
+}
+
+.voice-message {
+  background-color: #1aad19;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  color: #fff;
+}
+
+.voice-item {
+  display: flex;
+  align-items: center;
+}
+
+.voice-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+}
+
+.record-area {
+  padding: 20rpx;
+  background-color: #f1f1f1;
+}
+
+.record-status {
+  text-align: center;
+  margin-bottom: 10rpx;
+}
+
+.record-button {
+  width: 100%;
+  background-color: #1aad19;
+  color: #fff;
+}
+
+.record-button.recording {
+  background-color: #ff4d4f;
+}

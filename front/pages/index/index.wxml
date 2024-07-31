@@ -1,0 +1,28 @@
+<!-- index.wxml -->
+<view class="container">
+  <!-- 消息列表 -->
+  <scroll-view scroll-y class="message-list">
+    <block wx:for="{{voices}}" wx:key="index">
+      <view class="message {{item.type === 'voice' ? 'voice-message' : 'text-message'}}">
+        <text wx:if="{{item.type === 'text'}}">{{item.content}}</text>
+        <view wx:else class="voice-item" bindtap="playVoice" data-src="{{item.content}}">
+          <image src="/images/voice-icon.png" mode="aspectFit" class="voice-icon"></image>
+          <text>{{item.duration}}''</text>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <!-- 录音按钮和状态 -->
+  <view class="record-area">
+    <view class="record-status" wx:if="{{recordState}}">
+      正在录音... {{recordTime}}s
+    </view>
+    <button 
+      class="record-button {{recordState ? 'recording' : ''}}"
+      bindtap="{{recordState ? 'stopRecord' : 'startRecord'}}"
+    >
+      {{recordState ? '停止录音' : '开始录音'}}
+    </button>
+  </view>
+</view>

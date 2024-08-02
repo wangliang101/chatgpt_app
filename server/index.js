@@ -3,6 +3,7 @@ const fs = require('fs');
 const express = require('express');
 const axios = require('axios');
 const multer = require('multer');
+const FormData = require('form-data');
 
 require('dotenv').config();
 const { APP_ID, APP_SECRET, PORT } = process.env
@@ -52,18 +53,18 @@ async function getAccessToken() {
 async function recognizeSpeech(accessToken, filePath) {
   try {
     console.log('Reading file:', filePath);
-    const fileContent = fs.readFileSync(filePath);
-    const base64Audio = fileContent.toString('base64');
+    // const fileContent = fs.readFileSync(filePath);
+    // const base64Audio = fileContent.toString('base64');
+    const form = new FormData();
+    form.append('media', fs.createReadStream(filePath));
 
     const voice_id = Date.now().toString();
     const url = `https://api.weixin.qq.com/cgi-bin/media/voice/addvoicetorecofortext?access_token=${accessToken}&format=mp3&voice_id=${voice_id}&lang=zh_CN`
     console.log('Calling WeChat API...', url);
     const response = await axios.post(url,
+      form,
       {
-        voice: base64Audio
-      },
-      {
-        headers: { 'Content-Type': 'application/json' }
+        headers: form.getHeaders(),
       }
     );
 
@@ -80,7 +81,7 @@ async function recognizeSpeech(accessToken, filePath) {
       }
     );
     console.log('xxxxx', res.data)
-    return response.data.result;
+    return res.data.result;
   } catch (error) {
     console.error('Error recognizing speech:', error);
     throw error;
@@ -98,14 +99,14 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     let accessToken;
     let recognitionResult;
-    let retries = 3;
+    let retries = 1;
 
     while (retries > 0) {
       try {
         accessToken = await getAccessToken();
         console.log('Got access token:', accessToken);
 
-        recognitionResult = await recognizeSpeech(accessToken, `uploads/26.mp3`);
+        recognitionResult = await recognizeSpeech(accessToken, `uploads/0.mp3`);
         console.log('Recognition result:', recognitionResult);
         break;
       } catch (error) {

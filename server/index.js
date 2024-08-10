@@ -1,9 +1,11 @@
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const express = require('express');
 const axios = require('axios');
 const multer = require('multer');
 const FormData = require('form-data');
+const cors = require('cors')
 
 require('dotenv').config();
 const { APP_ID, APP_SECRET, PORT } = process.env
@@ -15,6 +17,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 const app = express();
+app.use(cors());
 
 // 替换为你的 AppID 和 AppSecret
 const appId = APP_ID;
@@ -49,6 +52,53 @@ async function getAccessToken() {
   }
 }
 
+async function fetchCompleteVoiceResult(accessToken, voice_id) {
+  const queryRecoresultUrl = `https://api.weixin.qq.com/cgi-bin/media/voice/queryrecoresultfortext?access_token=${accessToken}&voice_id=${voice_id}&lang=zh_CN`;
+
+  let resultText = '';
+  let isEnd = false;
+
+  while (!isEnd) {
+      try {
+          const res = await axios.post(queryRecoresultUrl, {}, {
+              headers: { 'Content-Type': 'application/json' }
+          });
+
+          if (res.data && res.data.result) {
+              resultText += res.data.result;  // 拼接结果
+          }
+
+          isEnd = res.data.is_end;  // 更新is_end状态
+
+      } catch (error) {
+          console.error('Error fetching voice result:', error);
+          throw error;  // 出现错误时抛出异常
+      }
+  }
+
+  return resultText;  // 返回拼接好的结果
+}
+
+async function hashFile(filePath, algorithm = 'sha256') {
+  return new Promise((resolve, reject) => {
+      const hash = crypto.createHash(algorithm);
+      const stream = fs.createReadStream(filePath);
+
+      stream.on('data', (data) => {
+          hash.update(data);
+      });
+
+      stream.on('end', () => {
+          const result = hash.digest('hex');
+          resolve(result);
+      });
+
+      stream.on('error', (err) => {
+          reject(err);
+      });
+  });
+}
+
 // 调用微信语音识别接口
 async function recognizeSpeech(accessToken, filePath) {
   try {
@@ -58,7 +108,10 @@ async function recognizeSpeech(accessToken, filePath) {
     const form = new FormData();
     form.append('media', fs.createReadStream(filePath));
 
-    const voice_id = Date.now().toString();
+    // 计算文件的哈希值，并将其作为 voice_id
+    const voice_id = await hashFile(filePath);
+    console.log(`Generated voice_id (file hash): ${voice_id}`);
+
     const url = `https://api.weixin.qq.com/cgi-bin/media/voice/addvoicetorecofortext?access_token=${accessToken}&format=mp3&voice_id=${voice_id}&lang=zh_CN`
     console.log('Calling WeChat API...', url);
     const response = await axios.post(url,
@@ -73,15 +126,9 @@ async function recognizeSpeech(accessToken, filePath) {
       throw new Error(`WeChat API error: ${response.data.errmsg}`);
     }
 
-    const queryRecoresultUrl = `https://api.weixin.qq.com/cgi-bin/media/voice/queryrecoresultfortext?access_token=${accessToken}&voice_id=${voice_id}&lang=zh_CN`
-    const res = await axios.post(queryRecoresultUrl,
-      {},
-      {
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
-    console.log('xxxxx', res.data)
-    return res.data.result;
+    const result = fetchCompleteVoiceResult(accessToken, voice_id)
+    return result;
+
   } catch (error) {
     console.error('Error recognizing speech:', error);
     throw error;
@@ -106,7 +153,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         accessToken = await getAccessToken();
         console.log('Got access token:', accessToken);
 
-        recognitionResult = await recognizeSpeech(accessToken, `uploads/0.mp3`);
+        recognitionResult = await recognizeSpeech(accessToken, req.file.path);
         console.log('Recognition result:', recognitionResult);
         break;
       } catch (error) {
@@ -118,7 +165,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 
     // 删除临时文件
-    fs.unlinkSync(req.file.path);
+    // fs.unlinkSync(req.file.path);
 
     res.json({ text: recognitionResult });
   } catch (error) {

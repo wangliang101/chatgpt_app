@@ -48,7 +48,8 @@ Page({
   uploadVoice(filePath) {
     wx.showLoading({ title: '识别中...' });
     wx.uploadFile({
-      url: 'http://localhost:3000/upload', // 替换为你的服务器地址
+      // url: 'http://localhost:3000/upload', // 替换为你的服务器地址
+      url: 'http://192.168.199.106:3000/upload', // 替换为你的服务器地址，此处一定要写成ip,否则真机调试会跨域
       filePath: filePath,
       name: 'file',
       success: (res) => {

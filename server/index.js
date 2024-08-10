@@ -165,7 +165,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 
     // 删除临时文件
-    // fs.unlinkSync(req.file.path);
+    fs.unlinkSync(req.file.path);
 
     res.json({ text: recognitionResult });
   } catch (error) {

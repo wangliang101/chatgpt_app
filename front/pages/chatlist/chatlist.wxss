@@ -1,0 +1,7 @@
+.chatlist-container .list-item{
+  display: flex;
+  height: 40px;
+  align-items: center;
+  background-color: azure;
+  /* outline: 1px solid black; */
+}

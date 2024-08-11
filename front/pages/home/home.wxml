@@ -1,0 +1,9 @@
+<!--pages/home/home.wxml-->
+
+sdasdwerew
+
+<!-- <view data-weui-theme="dark">
+  <mp-dialog title="test" show="{{true}}" bindbuttontap="tapDialogButton" buttons="{{buttons}}">
+    <view>test content</view>
+  </mp-dialog>
+</view> -->

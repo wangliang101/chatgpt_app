@@ -1,0 +1,7 @@
+<view class="chatlist-container">
+  <view class="list-item" wx:for="{{chatlist}}" wx:key="id" bindtap="handleItemTap" data-id="{{item.id}}">
+    <view class="user-avatar"><text>{{item.title}}</text></view>
+    <view class="user-chat">{{item.message}}</view>
+    <view class="chat-time">{{item.time}}</view>
+  </view>
+</view>

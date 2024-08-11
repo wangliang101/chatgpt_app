@@ -1,0 +1,16 @@
+<view class="chat-container">
+  <!-- 消息列表 -->
+  <view class="message-list">
+    <block wx:for="{{messages}}" wx:key="id">
+      <view class="message {{item.isSentByUser ? 'sent' : 'received'}}">
+        <text>{{item.content}}</text>
+      </view>
+    </block>
+  </view>
+  
+  <!-- 输入框和发送按钮 -->
+  <view class="input-container">
+    <input class="message-input" bindinput="onInput" value="{{inputValue}}" />
+    <button class="send-button" bindtap="sendMessage">发送</button>
+  </view>
+</view>

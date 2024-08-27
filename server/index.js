@@ -6,6 +6,7 @@ const axios = require('axios');
 const multer = require('multer');
 const FormData = require('form-data');
 const cors = require('cors')
+const bodyParser = require('body-parser')	
 
 require('dotenv').config();
 const { APP_ID, APP_SECRET, PORT } = process.env
@@ -18,6 +19,7 @@ if (!fs.existsSync(uploadsDir)) {
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json())
 
 // 替换为你的 AppID 和 AppSecret
 const appId = APP_ID;
@@ -173,6 +175,23 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     res.status(500).send('Server error: ' + error.message);
   }
 });
+
+
+app.post('/login',async(req,res)=>{
+  const {code} = req.body
+  console.log('code: ',code) // 打印一下code
+  const url = 'https://api.weixin.qq.com/sns/jscode2session'
+  const response = await axios.get(url, { params: {
+    appid: APP_ID,           // 确保在这里传递了正确的 appid
+    secret: APP_SECRET,      // 确保在这里传递了正确的 secret
+    js_code: code,
+    grant_type: 'authorization_code'
+  }}, {
+    headers: { 'Content-Type': 'application/json' }
+  })
+  const {errcode,errmsg,openid} = response.data
+  console.log('session: ' + errcode, errmsg, openid )
+})
 
 // 启动服务器
 app.listen(PORT, () => {

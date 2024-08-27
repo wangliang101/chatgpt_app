@@ -1,0 +1,35 @@
+<!--pages/login/login.wxml-->
+<!-- 如果只是展示用户头像昵称，可以使用 <open-data /> 组件 -->
+<button type="primary" bindtap="getUserProfile">获取用户信息</button>
+<open-data type="userAvatarUrl"></open-data>
+<open-data type="userNickName"></open-data>
+<!-- 需要使用 button 来授权登录 -->
+<button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">授权登录</button>
+<view wx:else>请升级微信版本</view>
+<page-layout>
+  <view slot="header">
+    <header-navbar title="个人信息"></header-navbar>
+  </view>
+  <!-- 关键代码 start -->
+  <view slot="scroll" class="content">
+    <view class="row">
+      <view class="text1">头像：</view>
+      <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image class="avatar" src="{{userInfo.avatar || ''}}"></image>
+      </button>
+    </view>
+    <view class="row">
+      <view class="text1">昵称：</view>
+      <input type="nickname" class="name-input" name="nickname" value="{{userInfo.nickName||''}}" bindchange="onInput" placeholder="请输入昵称" />
+    </view>
+  </view>
+   <!-- 关键代码 end -->
+  <view slot="bottom" class="info__footer">
+    <t-button t-class="footer-btn" theme="primary" content="保存" size="medium" shape="round" hover-class="none" bindtap="tapSave"></t-button>
+  </view>
+</page-layout>
+<button open-type="getUserInfo" bindgetuserinfo="allowGetUserInfo">微信一键登陆</button>
+<view class="container">
+    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">获取手机号</button>
+    <view>{{phone}}</view>
+</view>

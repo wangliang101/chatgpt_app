@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/login/login",
     "pages/home/home",
     "pages/index/index",
     "pages/logs/logs",
@@ -24,7 +25,6 @@
     "selectedColor": "#1cbbb4",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
-    "current": "0",
     "list": [
       {
         "pagePath": "pages/chatlist/chatlist",
